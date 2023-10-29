@@ -13,7 +13,12 @@ var categoryRouter = require('./routes/category');
 var articleRouter = require('./routes/article');
 var commentRouter = require('./routes/comment');
 var concernRouter = require('./routes/concern');
-var messageRouter = require('./routes/message')
+var messageRouter = require('./routes/message');
+var menuRouter = require('./routes/menu');
+var blogRouter = require('./routes/blog');
+var musicRouter = require('./routes/music');
+var statisticsRouter = require('./routes/statistics');
+
 
 var app = express();
 app.use((req,res,next) => {
@@ -67,6 +72,11 @@ app.use('/article', articleRouter);
 app.use('/comment', commentRouter);
 app.use('/concern', concernRouter);
 app.use('/message', messageRouter);
+app.use('/menu', menuRouter);
+app.use('/blog', blogRouter);
+app.use('/music', musicRouter);
+app.use('/statistics', statisticsRouter);
+
 
 
 // 定义错误级别中间件
@@ -74,7 +84,9 @@ app.use(function(err,req,res,next) {
   // 验证失败错误
   if(err instanceof joi.ValidationError) return res.back(err)
   // 身份认证失败错误
-  if(err.name === 'UnauthorizedError') return res.back('身份认证失败！')
+  if(err.name === 'UnauthorizedError') {
+    return res.back('身份认证失败！', 401)
+  }
   // 未知错误
   res.back(err)
 })

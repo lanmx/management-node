@@ -71,7 +71,7 @@ class UserService {
 
   /* 获取用户列表 */
   getUser(req,res) {
-    const sql = 'SELECT id,username,email,role,department FROM users WHERE status=?'
+    const sql = 'SELECT id,username,email,role,department,signature,create_date FROM users WHERE status=?'
     db.query(sql, 1, (err, results) => {
         if(err) return res.back(err)
         console.log(results)
@@ -111,7 +111,7 @@ class UserService {
     const sql = 'SELECT * FROM users WHERE username=?'
     db.query(sql, user.username, (err, results) => {
       if(err) return res.back(err)
-      if(results.length > 0) {
+      if(results.length > 1) {
         return res.back('用户名被占用，请更换其它用户名')
       } else {
         // 更新用户信息
@@ -122,10 +122,54 @@ class UserService {
           if(results.affectedRows !==1) {
             return res.back('更新用户信息失败！')
           } else {
-            return res.back('更新用户信息成功！')
+            return res.back('更新用户信息成功！', 0)
           }
         })
       }
+    })
+  }
+
+  /* 删除用户 */
+  deleteUser(req, res) {
+    const params = req.body
+    // 根据id查询用户信息
+    const sql = 'SELECT * FROM users WHERE id=?'
+    db.query(sql, params.id, (err, results) => {
+      if(err) return res.back(err)
+      if(results.length !== 1) {
+        return res.back('用户不存在！无法删除')
+      } else {
+        const sql = 'UPDATE users SET status=0 WHERE id=?'
+        db.query(sql, params.id, (err, results) => {
+            if(err) return res.back(err)
+            if(results.affectedRows !==1) {
+                return res.back('删除用户失败！')
+            } else {
+                return res.back('删除用户成功！', 0)
+            }
+        })
+      }
+    })
+  }
+
+  /* 搜索用户 */
+  searchUser(req, res) {
+    const params = req.body;
+    console.log(params)
+    let sql = ''
+    if (!params.username) {
+      sql = `SELECT * FROM users WHERE status=1`
+    } else {
+      sql = `SELECT * FROM users WHERE username like '%${params.username}%' and status=1`
+    }
+    console.log(sql)
+    db.query(sql, (err, results) => {
+      if(err) return res.back(err)
+      return res.send({
+        status: 0,
+        message: 'success',
+        data: results
+      })
     })
   }
 
@@ -152,7 +196,7 @@ class UserService {
             if(results.affectedRows !== 1) {
               return res.back('重置密码失败！')
             } else {
-              return res.back('重置密码成功！')
+              return res.back('重置密码成功！', 0)
             }
           })
         }
@@ -169,14 +213,14 @@ class UserService {
       if(results.affectedRows !==1) {
         return res.back('更新头像失败！')
       } else {
-        return res.back('更新头像成功！')
+        return res.back('更新头像成功！', 0)
       }
     })
   }
 
   /* 退出登录 */
   logout(req,res) {
-    return res.back('退出成功!')
+    return res.back('退出成功!', 0)
   }
 
   

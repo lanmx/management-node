@@ -8,14 +8,14 @@ const email = joi.string().required().pattern(/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])
 const id = joi.number().integer().min(1).required()
 // dataUri格式为 data:image/png;base64,VE9PTUFOWVNFQ1JFVFM=的字符串数据
 const avatar = joi.string().dataUri().required()
-
+const signature = joi.string().allow('')
 
 // 注册验证
 exports.reg_signup = { body: { username, password, email } }
 // 登录验证
 exports.reg_login = { body: { username, password } }
 // 修改用户信息验证
-exports.reg_user = { body: { id, username, email } }
+exports.reg_user = { body: { id, username, email, signature } }
 // 重置密码验证
 exports.reg_pwd = {
     body: {
@@ -28,3 +28,7 @@ exports.reg_pwd = {
 }
 // 头像验证
 exports.reg_avatar = { body: { id, avatar } }
+// 删除用户
+exports.reg_delete = { body: { id } }
+// 搜索用户
+exports.reg_search = { body: { username: joi.string().allow('') }}
